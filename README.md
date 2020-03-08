@@ -9,7 +9,7 @@ If your tabs is over than a screen width, this UI shows always a interruption of
 
 ![Before scroll](https://github.com/MTattin/FABoLLSlidableTabBar/blob/master/Images/first.png)
 
-![After scroll](https://github.com/MTattin/FABoLLSlidableTabBar/blob/master/Images/first.png)
+![After scroll](https://github.com/MTattin/FABoLLSlidableTabBar/blob/master/Images/end.png)
 
 
 # License
