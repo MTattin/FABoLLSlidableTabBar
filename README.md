@@ -7,8 +7,10 @@ This tabbar button is made rounded button like Google Maps.
 If your tabs is over than a screen width, this UI shows always a interruption of some button as a clip tip.
 
 
+Before scroll :
 ![Before scroll](https://github.com/MTattin/FABoLLSlidableTabBar/blob/master/Images/first.png)
 
+After scroll :
 ![After scroll](https://github.com/MTattin/FABoLLSlidableTabBar/blob/master/Images/end.png)
 
 
