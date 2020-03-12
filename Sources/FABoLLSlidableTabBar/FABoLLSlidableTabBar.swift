@@ -52,7 +52,7 @@ public class FABoLLSlidableTabBar: UIView {
     ///
     ///
     ///
-    private(set) var _selectedIndexPath: IndexPath = IndexPath.init(row: 0, section: 0)
+    private(set) var _selectedIndexPath: IndexPath? = nil
     ///
     /// This property is used for both side insets and clip tip display area width.
     /// Clip tip is set larger than this property.
@@ -89,7 +89,6 @@ public class FABoLLSlidableTabBar: UIView {
     ///
     ///
     override init(frame: CGRect) {
-        ///
         self._flowlayout.scrollDirection = UICollectionView.ScrollDirection.horizontal
         self._collectionView = UICollectionView.init(
             frame: frame,
@@ -115,15 +114,21 @@ public class FABoLLSlidableTabBar: UIView {
     ///
     public convenience init(
         size: CGSize,
+        initRow: Int? = nil,
         clipTipWidth: CGFloat = 10.0,
         settings: FABoLLSlidableTabBarSettings,
-        initRow: Int = 0,
         selected: ((_ row: Int) -> Void)?
     ) {
         self.init(frame: CGRect.init(origin: CGPoint.zero, size: size))
         self._clipTipWidth = clipTipWidth
         self._callbackSelected = selected
-        self._selectedIndexPath = IndexPath.init(row: initRow, section: 0)
+        if let row: Int = initRow {
+            self._selectedIndexPath = IndexPath.init(row: row, section: 0)
+        } else {
+            if settings.canUnselect == false {
+                self._selectedIndexPath = IndexPath.init(row: 0, section: 0)
+            }
+        }
         self._settings = settings
         self._setCellWidth()
         self._checkClipTip { [weak self] in
@@ -213,6 +218,35 @@ public class FABoLLSlidableTabBar: UIView {
             self._checkClipTip(callback)
         }
     }
+    ///
+    // MARK: -------------------- method
+    ///
+    /// - Parameter size:
+    ///     Size you want to change.
+    ///
+    /// - Parameter isScrollSelectedCellToCenter:
+    ///     If you want to scroll selected cell to tab bar center after changing size, please set  `true`.
+    ///     Default is `false`
+    ///
+    public func updateSize(_ size: CGSize, isScrollSelectedCellToCenter: Bool = false) {
+        self.frame.size = size
+        self._collectionView.frame = self.frame
+        self._setCellWidth()
+        self._checkClipTip { [weak self] in
+            self?._collectionView.reloadData()
+            guard
+                let selectedIndexPath = self?._selectedIndexPath,
+                isScrollSelectedCellToCenter == true
+            else {
+                return
+            }
+            self?._collectionView.scrollToItem(
+                at: selectedIndexPath,
+                at: UICollectionView.ScrollPosition.centeredHorizontally,
+                animated: true
+            )
+        }
+    }
 }
 ///
 // MARK: ------------------------------ UICollectionViewDelegate
@@ -224,24 +258,27 @@ extension FABoLLSlidableTabBar: UICollectionViewDelegate {
     ///
     ///
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if self._selectedIndexPath == indexPath {
+        if self._selectedIndexPath == indexPath, self._settings.canUnselect == false {
             self._callbackSelected?(indexPath.row)
             return
         }
-        let old: IndexPath = self._selectedIndexPath
-        self._selectedIndexPath = indexPath
-        self._collectionView.reloadItems(
-            at: [
-                old,
-                indexPath
-            ]
-        )
+        let newIndexPath: IndexPath? = (self._selectedIndexPath == indexPath) ? nil : indexPath
+        var reloadIndexPath: [IndexPath] = [
+            indexPath,
+        ]
+        if let old: IndexPath = self._selectedIndexPath, old != indexPath {
+            reloadIndexPath.append(old)
+        }
+        self._selectedIndexPath = newIndexPath
+        self._collectionView.reloadItems(at: reloadIndexPath)
         self._callbackSelected?(indexPath.row)
-        collectionView.scrollToItem(
-            at: indexPath,
-            at: UICollectionView.ScrollPosition.centeredHorizontally,
-            animated: true
-        )
+        if let selectedIndexPath = self._selectedIndexPath {
+            collectionView.scrollToItem(
+                at: selectedIndexPath,
+                at: UICollectionView.ScrollPosition.centeredHorizontally,
+                animated: true
+            )
+        }
     }
 }
 ///

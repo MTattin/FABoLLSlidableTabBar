@@ -36,9 +36,9 @@ final class FABoLLSlidableTabBarCell: UICollectionViewCell {
         let selected: CGFloat = label.frame.width
         let labelWidth: CGFloat = max(normal, selected)
         if iconSize == CGSize.zero {
-            return labelWidth
+            return ceil(labelWidth)
         }
-        return labelWidth + 5.0 + iconSize.width
+        return ceil(labelWidth + 5.0 + iconSize.width)
     }
     ///
     // MARK: -------------------- propetries
@@ -127,7 +127,7 @@ final class FABoLLSlidableTabBarCell: UICollectionViewCell {
         self._titleLeading = self._title.leadingAnchor
             .constraint(equalTo: self._icon.trailingAnchor, constant: 0.0)
         self._titleTrailing = self._title.trailingAnchor
-            .constraint(equalTo: self.contentView.trailingAnchor, constant: 0.0)
+            .constraint(greaterThanOrEqualTo: self.contentView.trailingAnchor, constant: 0.0)
         NSLayoutConstraint.activate(
             [
                 self._titleLeading,

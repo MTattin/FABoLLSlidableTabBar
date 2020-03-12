@@ -52,6 +52,11 @@ public struct FABoLLSlidableTabBarSettings {
     ///
     let data: [FABoLLSlidableTabBarCellData]
     ///
+    /// If you want to unselect a selected cell with tapping it, set this flag `true`.
+    /// Default is `false`.
+    ///
+    let canUnselect: Bool
+    ///
     ///
     ///
     let iconSize: CGSize
@@ -70,6 +75,7 @@ public struct FABoLLSlidableTabBarSettings {
     ///
     public init(
         data: [FABoLLSlidableTabBarCellData],
+        canUnselect: Bool = false,
         clipTipWidth: CGFloat = 10.0,
         iconSize: CGSize = CGSize.init(width: 24, height: 24),
         normalDecoration: FABoLLSlidableTabBarCellDecoration = (
@@ -88,6 +94,7 @@ public struct FABoLLSlidableTabBarSettings {
         )
     ) {
         self.data = data
+        self.canUnselect = canUnselect
         self.iconSize = iconSize
         self.normalDecoration = normalDecoration
         self.selectedDecoration = selectedDecoration

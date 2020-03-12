@@ -121,3 +121,23 @@ let tabBar: FABoLLSlidableTabBar = FABoLLSlidableTabBar.init(
     }
 )
 ```
+
+If you want to change a size when device rotated:
+
+```
+override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    super.viewWillTransition(to: size, with: coordinator)
+    coordinator.animate(alongsideTransition: { (_: UIViewControllerTransitionCoordinatorContext) in
+        ///
+        /// set new size
+        ///
+        tabBar.updateSize(newSize)
+        ///
+        /// If you want to scroll selected cell to tab bar center:
+        ///
+        // tabBar.updateSize(newSize, isScrollSelectedCellToCenter: true)
+    }) { (_: UIViewControllerTransitionCoordinatorContext) in
+        L.Debug("FBLVC Transition Did: \(self.view.frame) \(self.isLand)")
+    }
+}
+```
