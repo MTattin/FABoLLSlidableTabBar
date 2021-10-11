@@ -18,8 +18,8 @@ MIT
 
 # Dependency
 
-- iOS, >=11
-- Xcode, >= 11
+- iOS, >=14
+- Xcode, >= 13
 
 
 # Usage
