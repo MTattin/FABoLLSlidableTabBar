@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.10
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "FABoLLSlidableTabBar",
     platforms: [
-        .iOS(.v14),
+        .iOS(.v16),
     ],
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
@@ -25,7 +25,9 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "FABoLLSlidableTabBar",
-            dependencies: []),
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency")
+            ]),
         .testTarget(
             name: "FABoLLSlidableTabBarTests",
             dependencies: ["FABoLLSlidableTabBar"]),

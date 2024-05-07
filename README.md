@@ -1,5 +1,7 @@
 # FABoLLSlidableTabBar
 
+[![FABoLL](https://custom-icon-badges.herokuapp.com/badge/license-FABoLL-8BB80A.svg?logo=law&logoColor=white)]()　[![iOS 16.0](https://custom-icon-badges.herokuapp.com/badge/iOS-16.0-007bff.svg?logo=apple&logoColor=white)]()　[![Xcode 15.3](https://custom-icon-badges.herokuapp.com/badge/Xcode-15.3-007bff.svg?logo=Xcode&logoColor=white)]()　[![Swift 5.9](https://custom-icon-badges.herokuapp.com/badge/Swift-5.9-df5c43.svg?logo=Swift&logoColor=white)]()
+
 You can make tab bar which scrolls to horizontal direction.
 
 This tabbar button is made rounded button like Google Maps.
@@ -11,24 +13,11 @@ If your tabs is over than a screen width, this UI shows always a interruption of
 |:---:|:---:|
 | ![Before scroll](https://github.com/MTattin/FABoLLSlidableTabBar/blob/master/Images/first.png) | ![After scroll](https://github.com/MTattin/FABoLLSlidableTabBar/blob/master/Images/end.png) |
 
-
-# License
-MIT
-
-
-# Dependency
-
-- iOS, >=14
-- Xcode, >= 13
-
-
 # Usage
 
 ```
-///
-/// Tab bar data
-///
-private var _settingsData: [FABoLLSlidableTabBarCellData] = [
+// Tab bar data
+private var settingsData: [FABoLLSlidableTabBarCellData] = [
     (
         title: "コンビニ",
         icon: nil,
@@ -68,26 +57,19 @@ private var _settingsData: [FABoLLSlidableTabBarCellData] = [
 ```
 
 ```
-///
-/// Set tab bar size
-///
-var height: CGFloat = min(round(base * 0.1), 44.0)
-height = max(height, 32.0)
-let tabBarSize: CGSize = CGSize.init(
-    width: UIScreen.main.bounds.width,
-    height: height
-)
-///
-/// Create FABoLLSlidableTabBar
-///
-let tabBar: FABoLLSlidableTabBar = FABoLLSlidableTabBar.init(
+// Set tab bar size
+var height: CGFloat = min(round(base * 0.1), 44)
+height = max(height, 32)
+let tabBarSize = CGSize(width: UIScreen.main.bounds.width, height: height)
+
+// Create FABoLLSlidableTabBar
+let tabBar = FABoLLSlidableTabBar(
     size: tabBarSize,
-    settings: FABoLLSlidableTabBarSettings.init(
-        data: self._settingsData
+    settings: FABoLLSlidableTabBarSettings(
+        data: settingsData
     ),
-    selected: { [weak self] (row: Int) in
-        let title: String = self._settingsData[row].title ?? "error"
-        print(title)
+    selected: { row in
+        print(row)
     }
 )
 ```
@@ -95,29 +77,28 @@ let tabBar: FABoLLSlidableTabBar = FABoLLSlidableTabBar.init(
 Full parameters:
 
 ```
-let tabBar: FABoLLSlidableTabBar = FABoLLSlidableTabBar.init(
+let tabBar = FABoLLSlidableTabBar(
     size: tabBarSize,
-    settings: FABoLLSlidableTabBarSettings.init(
-        data: self._settingsData
-        iconSize: CGSize.init(width: 20, height: 20),
+    settings: FABoLLSlidableTabBarSettings(
+        data: settingsData
+        iconSize: CGSize(width: 20, height: 20),
         normalDecoration: (
-            titleFont: UIFont.init(name: "HelveticaNeue-Light", size: 13)!,
+            titleFont: UIFont(name: "HelveticaNeue-Light", size: 13)!,
             titleColor: UIColor.darkGray,
             fillColor:  UIColor.white.alpha(0.8),
             borderColor: UIColor.gray,
-            borderWidth: 1.0
+            borderWidth: 1
         ),
         selectedDecoration: (
-            titleFont: UIFont.init(name: "HelveticaNeue-Bold", size: 13)!,
+            titleFont: UIFont(name: "HelveticaNeue-Bold", size: 13)!,
             titleColor: UIColor.white,
             fillColor: UIColor.blue.alpha(0.8),
             borderColor: UIColor.blue,
-            borderWidth: 1.0
+            borderWidth: 1
         )
     ),
-    selected: { [weak self] (row: Int) in
-        let title: String = self._settingsData[row].title ?? "error"
-        print(title)
+    selected: { row in
+        print(row)
     }
 )
 ```
@@ -127,17 +108,11 @@ If you want to change a size when device rotated:
 ```
 override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
-    coordinator.animate(alongsideTransition: { (_: UIViewControllerTransitionCoordinatorContext) in
-        ///
-        /// set new size
-        ///
+    coordinator.animate(alongsideTransition: { _ in
+        // set new size
         tabBar.updateSize(newSize)
-        ///
-        /// If you want to scroll selected cell to tab bar center:
-        ///
-        // tabBar.updateSize(newSize, isScrollSelectedCellToCenter: true)
-    }) { (_: UIViewControllerTransitionCoordinatorContext) in
-        L.Debug("FBLVC Transition Did: \(self.view.frame) \(self.isLand)")
-    }
+        // If you want to scroll selected cell to tab bar center:
+        //tabBar.updateSize(newSize, isScrollSelectedCellToCenter: true)
+    }) { _ in }
 }
 ```

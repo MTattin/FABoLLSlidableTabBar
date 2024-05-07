@@ -1,39 +1,21 @@
 //
-//  FABoLLSlidableTabBarSettings.swift
+//  FABoLLSlidableTabBarSettings
 //
+//  © 2023 Masakiyo Tachikawa
 //
-//  Created by Masakiyo Tachikawa on 2020/03/04.
-//
+
 import UIKit
-///
-/// This type is for display contents of a cell.
-///
-/// - Tag: FABoLLSlidableTabBarCellData
-///
-/// ```
-/// title: String,
-/// icon: UIImage?,
-/// selected: UIImage?
-/// ```
-///
+
+// MARK: - FABoLLSlidableTabBarCellData
+
 public typealias FABoLLSlidableTabBarCellData = (
     title: String,
     icon: UIImage?,
     selected: UIImage?
 )
-///
-/// This type is for cell decoration.
-///
-/// - Tag: FABoLLSlidableTabBarCellDecoration
-///
-/// ```
-/// titleFont: UIFont,
-/// titleColor: UIColor,
-/// fillColor: UIColor,
-/// borderColor: UIColor,
-/// borderWidth: CGFloat
-/// ```
-///
+
+// MARK: - FABoLLSlidableTabBarCellDecoration
+
 public typealias FABoLLSlidableTabBarCellDecoration = (
     titleFont: UIFont,
     titleColor: UIColor,
@@ -41,56 +23,44 @@ public typealias FABoLLSlidableTabBarCellDecoration = (
     borderColor: UIColor,
     borderWidth: CGFloat
 )
-///
-/// - Tag: FABoLLSlidableTabBarSettings
-///
+
+// MARK: - FABoLLSlidableTabBarSettings
+
 public struct FABoLLSlidableTabBarSettings {
-    ///
-    // MARK: -------------------- properties
-    ///
-    ///
-    ///
+
+    // MARK: - Properties
+
     let data: [FABoLLSlidableTabBarCellData]
-    ///
     /// If you want to unselect a selected cell with tapping it, set this flag `true`.
     /// Default is `false`.
-    ///
     let canUnselect: Bool
-    ///
-    ///
-    ///
+
     let iconSize: CGSize
-    ///
     /// This decoration is used for normal status.
-    ///
     let normalDecoration: FABoLLSlidableTabBarCellDecoration
-    ///
     /// This decoration is used for selected status.
-    ///
     let selectedDecoration: FABoLLSlidableTabBarCellDecoration
-    ///
-    // MARK: -------------------- life cycle
-    ///
-    ///
-    ///
+
+    // MARK: - Life cycle
+
     public init(
         data: [FABoLLSlidableTabBarCellData],
         canUnselect: Bool = false,
-        clipTipWidth: CGFloat = 10.0,
-        iconSize: CGSize = CGSize.init(width: 24, height: 24),
+        clipTipWidth: CGFloat = 10,
+        iconSize: CGSize = CGSize(width: 24, height: 24),
         normalDecoration: FABoLLSlidableTabBarCellDecoration = (
-            titleFont: UIFont.systemFont(ofSize: 14.0),
-            titleColor: UIColor.blue,
-            fillColor: UIColor.white,
-            borderColor: UIColor.blue,
-            borderWidth: 1.0
+            titleFont: UIFont.systemFont(ofSize: 14),
+            titleColor: .blue,
+            fillColor: .white,
+            borderColor: .blue,
+            borderWidth: 1
         ),
         selectedDecoration: FABoLLSlidableTabBarCellDecoration = (
-            titleFont: UIFont.boldSystemFont(ofSize: 14.0),
-            titleColor: UIColor.white,
-            fillColor: UIColor.blue,
-            borderColor: UIColor.blue,
-            borderWidth: 1.0
+            titleFont: UIFont.boldSystemFont(ofSize: 14),
+            titleColor: .white,
+            fillColor: .blue,
+            borderColor: .blue,
+            borderWidth: 1
         )
     ) {
         self.data = data
