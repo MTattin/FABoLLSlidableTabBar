@@ -1,5 +1,5 @@
 //
-//  FABoLLSlidableTabBar.swift
+//  FABoLLSlidableTabBar
 //
 //  Created by Masakiyo Tachikawa on 2020/03/05.
 //  Copyright © 2020 FABoLL. All rights reserved.
@@ -24,182 +24,141 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
+//  © 2023 Masakiyo Tachikawa
+//
+
 import UIKit
-///
+
+// MARK: - FABoLLSlidableTabBar
+
 /// Create a tab bar using UICollectionView
-///
-/// - Tag: FABoLLSlidableTabBar
-///
 public class FABoLLSlidableTabBar: UIView {
-    ///
-    // MARK: ------------------------------ properties
-    ///
-    ///
-    ///
-    private let _flowlayout: UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
-    ///
-    ///
-    ///
-    private let _collectionView: UICollectionView
-    ///
-    ///
-    ///
-    private var _settings: FABoLLSlidableTabBarSettings = FABoLLSlidableTabBarSettings.init(data: [])
-    ///
-    ///
-    ///
-    private var _callbackSelected: ((_ row: Int) -> Void)?
-    ///
-    ///
-    ///
-    private(set) var _selectedIndexPath: IndexPath? = nil
-    ///
+
+    // MARK: - Properties
+
+    private let flowLayout = UICollectionViewFlowLayout()
+
+    private let collectionView: UICollectionView
+
+    private var settings = FABoLLSlidableTabBarSettings(data: [])
+
+    private var callbackSelected: ((_ row: Int) -> Void)?
+
+    private(set) var selectedIndexPath: IndexPath? = nil
     /// This property is used for both side insets and clip tip display area width.
     /// Clip tip is set larger than this property.
-    ///
-    private var _clipTipWidth: CGFloat = 10.0
-    ///
+    private var clipTipWidth: CGFloat = 10
     /// This property is used for a margin between each cell.
-    ///
-    private var _cellMarginHorizontal: CGFloat = 10.0
-    ///
+    private var cellMarginHorizontal: CGFloat = 10
     /// This property is used for a horizontal padding of each cell.
     /// This is added 1px automatically when all cells is not on the clip tip area.
-    ///
-    private var _cellPaddingHorizontal: CGFloat = 15.0
-    ///
-    /// This property is used for cache to save each caluculated cell witdh.
-    ///
-    private var _cellWidthList: [IndexPath : CGFloat] = [:]
-    ///
-    // MARK: -------------------- life cycle
-    ///
-    ///
-    ///
+    private var cellPaddingHorizontal: CGFloat = 15
+    /// This property is used for cache to save each calculated cell width.
+    private var cellWidthList: [IndexPath : CGFloat] = [:]
+
+    // MARK: - Life cycle
+
     deinit {
         print("FABoLLSlidableTabBar released")
     }
-    ///
-    ///
-    ///
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    ///
-    ///
-    ///
+
     override init(frame: CGRect) {
-        self._flowlayout.scrollDirection = UICollectionView.ScrollDirection.horizontal
-        self._collectionView = UICollectionView.init(
+        flowLayout.scrollDirection = .horizontal
+        collectionView = UICollectionView(
             frame: frame,
-            collectionViewLayout: self._flowlayout
+            collectionViewLayout: flowLayout
         )
         super.init(frame: frame)
-        self.backgroundColor = UIColor.clear
-        self.addSubview(self._collectionView)
-        ///
-        self._collectionView.showsHorizontalScrollIndicator = false
-        self._collectionView.showsVerticalScrollIndicator = false
-        self._collectionView.backgroundView = nil
-        self._collectionView.backgroundColor = UIColor.clear
-        self._collectionView.delegate = self
-        self._collectionView.dataSource = self
-        self._collectionView.register(
+        backgroundColor = .clear
+        addSubview(collectionView)
+
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.backgroundView = nil
+        collectionView.backgroundColor = .clear
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(
             FABoLLSlidableTabBarCell.self,
             forCellWithReuseIdentifier: FABoLLSlidableTabBarCell.Identifier
         )
     }
-    ///
-    ///
-    ///
+
     public convenience init(
         size: CGSize,
         initRow: Int? = nil,
-        clipTipWidth: CGFloat = 10.0,
+        clipTipWidth: CGFloat = 10,
         settings: FABoLLSlidableTabBarSettings,
         selected: ((_ row: Int) -> Void)?
     ) {
-        self.init(frame: CGRect.init(origin: CGPoint.zero, size: size))
-        self._clipTipWidth = clipTipWidth
-        self._callbackSelected = selected
-        if let row: Int = initRow {
-            self._selectedIndexPath = IndexPath.init(row: row, section: 0)
+        self.init(frame: CGRect(origin: .zero, size: size))
+        self.clipTipWidth = clipTipWidth
+        callbackSelected = selected
+        if let initRow {
+            selectedIndexPath = IndexPath(row: initRow, section: 0)
         } else {
-            if settings.canUnselect == false {
-                self._selectedIndexPath = IndexPath.init(row: 0, section: 0)
+            if !settings.canUnselect {
+                selectedIndexPath = IndexPath(row: 0, section: 0)
             }
         }
-        self._settings = settings
-        self._setCellWidth()
-        self._checkClipTip { [weak self] in
-            self?._collectionView.reloadData()
+        self.settings = settings
+        setCellWidth()
+        checkClipTip { [weak self] in
+            self?.collectionView.reloadData()
         }
     }
-    ///
-    ///
-    ///
-    private func _setCellWidth() {
-        self._cellWidthList.removeAll()
+
+    private func setCellWidth() {
+        cellWidthList.removeAll()
         var row: Int = 0
-        for item in self._settings.data {
-            let iconSize: CGSize = (item.icon == nil) ? CGSize.zero : self._settings.iconSize
+        for item in settings.data {
+            let iconSize: CGSize = (item.icon == nil) ? .zero : settings.iconSize
             let width: CGFloat = FABoLLSlidableTabBarCell.CellWidth(
-                font: self._settings.normalDecoration.titleFont,
-                fontSelected: self._settings.selectedDecoration.titleFont,
+                font: settings.normalDecoration.titleFont,
+                fontSelected: settings.selectedDecoration.titleFont,
                 title: item.title,
                 iconSize: iconSize
             )
-            self._cellWidthList[IndexPath.init(row: row, section: 0)] = width
+            cellWidthList[IndexPath(row: row, section: 0)] = width
             row += 1
         }
     }
-    ///
-    ///
-    ///
-    private func _checkClipTip(_ callback: (() -> Void)?) {
-        var tempX: CGFloat = self._clipTipWidth
-        ///
-        /// create frame of each cell
-        ///
-        let frames: [CGRect] = self._cellWidthList
+
+    private func checkClipTip(_ callback: (() -> Void)?) {
+        var tempX: CGFloat = clipTipWidth
+        // create frame of each cell
+        let frames: [CGRect] = cellWidthList
             .sorted { (a: (key: IndexPath, value: CGFloat), b: (key: IndexPath, value: CGFloat)) -> Bool in
-                return a.key.row < b.key.row
+                a.key.row < b.key.row
             }
             .map { (item: (key: IndexPath, value: CGFloat)) -> CGRect in
-                let cellWidth: CGFloat = round(item.value + (self._cellPaddingHorizontal * 2.0))
-                let frame: CGRect = CGRect.init(
-                    x: tempX,
-                    y: 0.0,
-                    width: cellWidth,
-                    height: self._collectionView.frame.height
-                )
-                tempX += (cellWidth + self._cellMarginHorizontal)
+                let cellWidth: CGFloat = round(item.value + (cellPaddingHorizontal * 2))
+                let frame = CGRect(x: tempX, y: 0, width: cellWidth, height: collectionView.frame.height)
+                tempX += (cellWidth + cellMarginHorizontal)
                 return frame
             }
-        ///
-        /// is a need to check clip tip ?
-        ///
+
+        // is a need to check clip tip ?
         guard let lastFrame: CGRect = frames.last else {
             callback?()
             return
         }
-        let clipTipPoint: CGPoint = CGPoint.init(
-            x: self._collectionView.frame.width,
-            y: self._collectionView.frame.height * 0.5
-        )
+        let clipTipPoint = CGPoint(x: collectionView.frame.width, y: collectionView.frame.height * 0.5)
         if (lastFrame.origin.x + lastFrame.width) <= clipTipPoint.x {
             callback?()
             return
         }
-        ///
-        /// check clip tip
-        ///
+        // check clip tip
         var canCallback: Bool = false
         for cellFrame in frames {
-            let okArea: CGRect = CGRect.init(
-                x: cellFrame.origin.x + self._clipTipWidth,
+            let okArea = CGRect(
+                x: cellFrame.origin.x + clipTipWidth,
                 y: cellFrame.origin.y,
-                width: cellFrame.width - (self._clipTipWidth * 2.0),
+                width: cellFrame.width - (clipTipWidth * 2),
                 height: cellFrame.height
             )
             if okArea.contains(clipTipPoint) {
@@ -213,170 +172,130 @@ public class FABoLLSlidableTabBar: UIView {
         if canCallback == true {
             callback?()
         } else {
-            self._cellPaddingHorizontal += 1.0
-            self._setCellWidth()
-            self._checkClipTip(callback)
+            cellPaddingHorizontal += 1
+            setCellWidth()
+            checkClipTip(callback)
         }
     }
-    ///
-    // MARK: -------------------- method
-    ///
+
+    // MARK: - Conveniences
+
     /// - Parameter size:
     ///     Size you want to change.
     ///
     /// - Parameter isScrollSelectedCellToCenter:
     ///     If you want to scroll selected cell to tab bar center after changing size, please set  `true`.
     ///     Default is `false`
-    ///
     public func updateSize(_ size: CGSize, isScrollSelectedCellToCenter: Bool = false) {
-        self.frame.size = size
-        self._collectionView.frame = self.frame
-        self._setCellWidth()
-        self._checkClipTip { [weak self] in
-            self?._collectionView.reloadData()
+        frame.size = size
+        collectionView.frame = frame
+        setCellWidth()
+        checkClipTip { [weak self] in
+            guard let self else { return }
+            collectionView.reloadData()
             guard
-                let selectedIndexPath = self?._selectedIndexPath,
+                let selectedIndexPath,
                 isScrollSelectedCellToCenter == true
             else {
                 return
             }
-            self?._collectionView.scrollToItem(
-                at: selectedIndexPath,
-                at: UICollectionView.ScrollPosition.centeredHorizontally,
-                animated: true
-            )
+            collectionView.scrollToItem(at: selectedIndexPath, at: .centeredHorizontally, animated: true)
         }
     }
 }
-///
-// MARK: ------------------------------ UICollectionViewDelegate
-///
-///
-///
+
+// MARK: - UICollectionViewDelegate
+
 extension FABoLLSlidableTabBar: UICollectionViewDelegate {
-    ///
-    ///
-    ///
+
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if self._selectedIndexPath == indexPath, self._settings.canUnselect == false {
-            self._callbackSelected?(indexPath.row)
+        if selectedIndexPath == indexPath, settings.canUnselect == false {
+            callbackSelected?(indexPath.row)
             return
         }
-        let newIndexPath: IndexPath? = (self._selectedIndexPath == indexPath) ? nil : indexPath
+        let newIndexPath: IndexPath? = (selectedIndexPath == indexPath) ? nil : indexPath
         var reloadIndexPath: [IndexPath] = [
             indexPath,
         ]
-        if let old: IndexPath = self._selectedIndexPath, old != indexPath {
+        if let old: IndexPath = selectedIndexPath, old != indexPath {
             reloadIndexPath.append(old)
         }
-        self._selectedIndexPath = newIndexPath
-        self._collectionView.reloadItems(at: reloadIndexPath)
-        self._callbackSelected?(indexPath.row)
-        if let selectedIndexPath = self._selectedIndexPath {
-            collectionView.scrollToItem(
-                at: selectedIndexPath,
-                at: UICollectionView.ScrollPosition.centeredHorizontally,
-                animated: true
-            )
+        selectedIndexPath = newIndexPath
+        collectionView.reloadItems(at: reloadIndexPath)
+        callbackSelected?(indexPath.row)
+        if let selectedIndexPath {
+            collectionView.scrollToItem(at: selectedIndexPath, at: .centeredHorizontally, animated: true)
         }
     }
 }
-///
-// MARK: ------------------------------ UICollectionViewDataSource
-///
-///
-///
+
+// MARK: - UICollectionViewDataSource
+
 extension FABoLLSlidableTabBar: UICollectionViewDataSource {
-    ///
-    ///
-    ///
+
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self._settings.data.count
+        settings.data.count
     }
-    ///
-    ///
-    ///
+
     public func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        let cell: FABoLLSlidableTabBarCell = collectionView.dequeueReusableCell(
+        let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: FABoLLSlidableTabBarCell.Identifier,
             for: indexPath
         ) as! FABoLLSlidableTabBarCell
-        let item: FABoLLSlidableTabBarCellData = self._settings.data[indexPath.row]
+        let item: FABoLLSlidableTabBarCellData = settings.data[indexPath.row]
         cell.set(
             title: item.title,
-            icon: (self._selectedIndexPath == indexPath)
-                ? item.selected
-                : item.icon,
-            iconSize: self._settings.iconSize,
-            paddingHorizontal: self._cellPaddingHorizontal
+            icon: (selectedIndexPath == indexPath) ? item.selected : item.icon,
+            iconSize: settings.iconSize,
+            paddingHorizontal: cellPaddingHorizontal
         )
         cell.decoration(
-            style: (self._selectedIndexPath == indexPath)
-                ? self._settings.selectedDecoration
-                : self._settings.normalDecoration,
+            style: (selectedIndexPath == indexPath) ? settings.selectedDecoration : settings.normalDecoration,
             height: collectionView.frame.height
         )
         return cell
     }
 }
-///
-// MARK: -------------------- UICollectionViewDelegateFlowLayout
-///
-///
-///
+
+// MARK: - UICollectionViewDelegateFlowLayout
+
 extension FABoLLSlidableTabBar: UICollectionViewDelegateFlowLayout {
-    ///
-    ///
-    ///
+
     public func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
-    ) -> CGSize {        
-        guard let width: CGFloat = self._cellWidthList[indexPath] else {
+    ) -> CGSize {
+        guard let width: CGFloat = cellWidthList[indexPath] else {
             fatalError()
         }
-        return CGSize.init(
-            width: width + (self._cellPaddingHorizontal * 2),
-            height: collectionView.frame.height
-        )
+        return CGSize(width: width + (cellPaddingHorizontal * 2), height: collectionView.frame.height)
     }
-    ///
-    ///
-    //
+
     public func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
         insetForSectionAt section: Int
     ) -> UIEdgeInsets {
-        return UIEdgeInsets.init(
-            top: 0.0,
-            left: self._clipTipWidth,
-            bottom: 0.0,
-            right: self._clipTipWidth
-        )
+        UIEdgeInsets(top: 0, left: clipTipWidth, bottom: 0, right: clipTipWidth)
     }
-    ///
-    ///
-    ///
+
     public func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
         minimumLineSpacingForSectionAt section: Int
     ) -> CGFloat {
-        return 0.0
+        0
     }
-    ///
-    ///
-    ///
+
     public func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
         minimumInteritemSpacingForSectionAt section: Int
     ) -> CGFloat {
-        return self._cellMarginHorizontal
+        cellMarginHorizontal
     }
 }
