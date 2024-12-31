@@ -1,37 +1,11 @@
 //
 //  FABoLLSlidableTabBar
 //
-//  Created by Masakiyo Tachikawa on 2020/03/05.
-//  Copyright © 2020 FABoLL. All rights reserved.
-//
-//  Copyright 2020 Masakiyo Tachikawa
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
-//
 //  © 2023 Masakiyo Tachikawa
 //
 
 import UIKit
 
-// MARK: - FABoLLSlidableTabBar
-
-/// Create a tab bar using UICollectionView
 public class FABoLLSlidableTabBar: UIView {
 
     // MARK: - Properties
@@ -40,11 +14,11 @@ public class FABoLLSlidableTabBar: UIView {
 
     private let collectionView: UICollectionView
 
-    private var settings = FABoLLSlidableTabBarSettings(data: [])
-
     private var callbackSelected: ((_ row: Int) -> Void)?
 
     private(set) var selectedIndexPath: IndexPath? = nil
+
+    private var settings: FABoLLSlidableTabBarSettings = .init()
     /// This property is used for both side insets and clip tip display area width.
     /// Clip tip is set larger than this property.
     private var clipTipWidth: CGFloat = 10
@@ -245,7 +219,7 @@ extension FABoLLSlidableTabBar: UICollectionViewDataSource {
             withReuseIdentifier: FABoLLSlidableTabBarCell.Identifier,
             for: indexPath
         ) as! FABoLLSlidableTabBarCell
-        let item: FABoLLSlidableTabBarCellData = settings.data[indexPath.row]
+        let item: FABoLLSlidableTabBar.CellData = settings.data[indexPath.row]
         cell.set(
             title: item.title,
             icon: (selectedIndexPath == indexPath) ? item.selected : item.icon,
