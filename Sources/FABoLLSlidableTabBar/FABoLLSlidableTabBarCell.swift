@@ -10,7 +10,7 @@ import UIKit
 
 final class FABoLLSlidableTabBarCell: UICollectionViewCell {
 
-    // MARK: - Static Propetries
+    // MARK: - Static Properties
 
     static let Identifier: String = "FABoLLSlidableTabBarCell"
 
@@ -35,17 +35,12 @@ final class FABoLLSlidableTabBarCell: UICollectionViewCell {
     // MARK: - Properties
 
     private let title = UILabel()
-
     private var titleLeading: NSLayoutConstraint!
-
     private var titleTrailing: NSLayoutConstraint!
 
     private let icon = UIImageView()
-
     private var iconLeading: NSLayoutConstraint!
-
     private var iconWidth: NSLayoutConstraint!
-
     private var iconHeight: NSLayoutConstraint!
 
     // MARK: - Life cycle
@@ -125,7 +120,7 @@ final class FABoLLSlidableTabBarCell: UICollectionViewCell {
         self.icon.isHidden = false
     }
 
-    func decoration(style: FABoLLSlidableTabBarCellDecoration, height: CGFloat) {
+    func decoration(style: FABoLLSlidableTabBar.CellDecoration, height: CGFloat) {
         contentView.backgroundColor = style.fillColor
         contentView.layer.cornerRadius = height * 0.5
         contentView.layer.borderColor = style.borderColor.cgColor
